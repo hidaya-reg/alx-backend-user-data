@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-""" Authentication module """
+""" Authentication module
+"""
 from typing import List, TypeVar
 from flask import request
 
-User = TypeVar('User')
-
 
 class Auth:
+    """a class to manage the API authentication."""
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """ Determines if a path requires authentication """
         return False
@@ -15,6 +15,6 @@ class Auth:
         """ Returns the authorization header """
         return None
 
-    def current_user(self, request=None) -> User:
+    def current_user(self, request=None) -> TypeVar('User'):
         """ Returns the current user """
         return None
