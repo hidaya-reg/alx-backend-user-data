@@ -58,12 +58,11 @@ class BasicAuth(Auth):
         self, user_email: str, user_pwd: str
     ) -> TypeVar('User'):
         """ Retrieve User instance from email and password """
-        if not isinstance(user_email, str) or not isinstance(user_pwd, str):
-            return None
-        users = User.search({"email": user_email})
-        if not users:
-            return None
-        user = users[0]
-        if user.is_valid_password(user_pwd):
-            return user
+        if isinstance(user_email, str) and isinstance(user_pwd, str):
+            try:
+                users = User.search({'email': user_email})
+                if users and users[0].is_valid_password(user_pwd):
+                    return users[0]
+            except Exception:
+                pass
         return None
