@@ -5,6 +5,7 @@ from os import getenv
 
 app = Flask(__name__)
 
+
 @app.route('/auth_session/login', methods=['POST'], strict_slashes=False)
 def login():
     """Handles user login"""
