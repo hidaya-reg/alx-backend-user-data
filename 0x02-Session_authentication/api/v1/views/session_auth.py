@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+""" View for Session Authentication
+"""
 from flask import Flask, request, jsonify
 from models.user import User
 from api.v1.app import auth
