@@ -5,8 +5,7 @@ from os import getenv
 
 app = Flask(__name__)
 
-@app.route('/api/v1/auth_session/login', methods=['POST'], strict_slashes=False)
-@app.route('/api/v1/auth_session/login/', methods=['POST'], strict_slashes=False)
+@app.route('/auth_session/login', methods=['POST'], strict_slashes=False)
 def login():
     """Handles user login"""
     email = request.form.get('email')
@@ -27,5 +26,4 @@ def login():
     response = jsonify(user.to_json())
     cookie_name = getenv("SESSION_NAME", "_my_session_id")
     response.set_cookie(cookie_name, session_id)
-    
     return response
