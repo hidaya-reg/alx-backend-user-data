@@ -35,20 +35,23 @@ class DB:
         """Add a new user to the database and return the User object
         """
         new_user = User(email=email, hashed_password=hashed_password)
-        session = self._session
-        session.add(new_user)
-        session.commit()
+        try:
+            self._session.add(new_user)
+            self._session.commit()
+        except Exception as e:
+            print(f"Error adding user to database: {e}")
+            self._session.rollback()
+            raise
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
         """Find a user by arbitrary keyword arguments
         """
         session = self._session
-        
         try:
             user = session.query(User).filter_by(**kwargs).one()
-            return user
         except NoResultFound:
-            raise NoResultFound("No user found matching the criteria.")
-        except Exception:
-            raise InvalidRequestError("Invalid query parameters.")
+            raise NoResultFound()
+        except InvalidRequestError:
+            raise InvalidRequestError()
+        return user
