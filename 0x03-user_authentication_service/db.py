@@ -53,6 +53,6 @@ class DB:
         session = self._session
         query = session.query(User)
         user = query.filter(tuple_(*attrs).in_([tuple(vals)])).first()
-        if not user:
+        if user is None:
             raise NoResultFound()
         return user
