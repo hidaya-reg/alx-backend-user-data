@@ -43,16 +43,12 @@ class DB:
     def find_user_by(self, **kwargs) -> User:
         """Find a user by arbitrary keyword arguments
         """
-        attrs, vals = [], []
-        for attr, val in kwargs.items():
-            if not hasattr(User, attr):
-                raise InvalidRequestError()
-            attrs.append(getattr(User, attr))
-            vals.append(val)
-
         session = self._session
-        query = session.query(User)
-        user = query.filter(tuple_(*attrs).in_([tuple(vals)])).first()
-        if user is None:
-            raise NoResultFound()
-        return user
+        
+        try:
+            user = session.query(User).filter_by(**kwargs).one()
+            return user
+        except NoResultFound:
+            raise NoResultFound("No user found matching the criteria.")
+        except Exception:
+            raise InvalidRequestError("Invalid query parameters.")
