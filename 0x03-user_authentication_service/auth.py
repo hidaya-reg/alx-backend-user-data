@@ -11,8 +11,7 @@ from sqlalchemy.exc import NoResultFound
 def _hash_password(password: str) -> bytes:
     """Hash a password using bcrypt.
     """
-    pwd = password.encode()
-    return bcrypt.hashpw(pwd, bcrypt.gensalt())
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
 
 class Auth:
