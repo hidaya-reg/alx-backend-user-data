@@ -2,20 +2,21 @@
 """Basic Flask app
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from auth import Auth
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 AUTH = Auth()
 
 
-@app.route("/", methods=["GET"], strict_slashes=False)
+@app.route("/", methods=["GET"])
 def index():
     """Return a welcome message."""
     return jsonify({"message": "Bienvenue"})
 
 
-@app.route("/users", methods=["POST"], strict_slashes=False)
+@app.route("/users", methods=["POST"])
 def users() -> str:
     """POST /users
     """
@@ -27,7 +28,7 @@ def users() -> str:
         return jsonify({"message": "email already registered"}), 400
 
 
-@app.route("/sessions", methods=["POST"], strict_slashes=False)
+@app.route("/sessions", methods=["POST"])
 def login():
     """ Login endpoint
     """
