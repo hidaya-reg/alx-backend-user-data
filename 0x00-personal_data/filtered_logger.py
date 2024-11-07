@@ -5,6 +5,7 @@ obfuscat log message
 import re
 from typing import List
 import logging
+import os
 import mysql.connector
 
 PII_FIELDS = ("email", "phone", "ssn", "password", "last_login")
