@@ -3,10 +3,18 @@
 obfuscat log message
 """
 import re
+from typing import List
 
 
-def filter_datum(fields, redaction, message, separator):
-    """returns the log message obfuscated"""
+def filter_datum(
+    fields: List[str],
+    redaction: str,
+    message: str,
+    separator: str
+) -> str:
+    """
+    returns the log message obfuscated
+    """
     pattern = '|'.join([
         f'{field}=.*?{separator}' for field in fields
     ])
