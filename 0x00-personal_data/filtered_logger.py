@@ -5,6 +5,7 @@ obfuscat log message
 import re
 from typing import List
 import logging
+import mysql.connector
 
 PII_FIELDS = ("email", "phone", "ssn", "password", "last_login")
 
@@ -61,3 +62,26 @@ def get_logger() -> logging.Logger:
     handler = logging.StreamHandler()
     handler.setFormatter(RedactingFormatter(fields=PII_FIELDS))
     logger.addHandler(handler)
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """
+    Returns a connector to the MySQL database using environment variables.
+    """
+    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME")
+
+    if db_name is None:
+        raise ValueError(
+            "The environment variable "
+            "PERSONAL_DATA_DB_NAME must be set."
+        )
+
+    return mysql.connector.connect(
+        user=username,
+        password=password,
+        host=host,
+        database=db_name
+    )
