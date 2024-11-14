@@ -10,7 +10,8 @@ from api.v1.app import auth
 app = Flask(__name__)
 
 
-@app_views.route('/auth_session/logout', methods=['DELETE'], strict_slashes=False)
+@app_views.route(
+        '/auth_session/logout', methods=['DELETE'], strict_slashes=False)
 def logout():
     """Deletes the user session by logging them out."""
     if not auth.destroy_session(request):
