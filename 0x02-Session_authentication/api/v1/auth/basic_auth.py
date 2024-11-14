@@ -73,14 +73,17 @@ class BasicAuth(Auth):
                    Returns (None, None) if input is invalid or if the
                    format is incorrect.
         """
+        if decoded_base64_authorization_header is None:
+            return None, None
         if not isinstance(decoded_base64_authorization_header, str):
             return None, None
-
         if ':' not in decoded_base64_authorization_header:
             return None, None
+        parts = decoded_base64_authorization_header.split(':', 1)
+        if len(parts) != 2:
+            return None, None
 
-        email, password = decoded_base64_authorization_header.split(":", 1)
-        return email, password
+        return parts[0], parts[1]
 
     def user_object_from_credentials(
             self, user_email: str, user_pwd: str) -> TypeVar('User'):
@@ -95,17 +98,14 @@ class BasicAuth(Auth):
             User: The User instance if credentials are valid.
             None: If any validation fails (invalid email or password).
         """
-        if not isinstance(user_email, str) or not isinstance(user_pwd, str):
-            return None
-
-        # Search for the user by email
-        user = User.search(user_email)
-
-        # Check if user exists and password is valid
-        if user is None or not user.is_valid_password(user_pwd):
-            return None
-
-        return user
+        if isinstance(user_email, str) and isinstance(user_pwd, str):
+            try:
+                users = User.search({'email': user_email})
+                if users and users[0].is_valid_password(user_pwd):
+                    return users[0]
+            except Exception:
+                pass
+        return None
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
@@ -119,36 +119,23 @@ class BasicAuth(Auth):
             User: The User instance if authenticated.
             None: If no valid user is found or authentication fails.
         """
-        # Retrieve the authorization header
-        authorization_header = self.authorization_header(request)
-
-        if authorization_header is None:
+        if request is None:
             return None
 
-        # Extract the Base64 authorization header
-        base64_authorization_header = (
-            self.extract_base64_authorization_header(authorization_header)
-        )
-
-        if base64_authorization_header is None:
+        auth_header = request.headers.get('Authorization')
+        if auth_header is None:
             return None
 
-        # Decode the Base64 header
-        decoded_base64 = (
-            self.decode_base64_authorization_header(
-                base64_authorization_header)
-        )
-
-        if decoded_base64 is None:
+        base64_auth = self.extract_base64_authorization_header(auth_header)
+        if base64_auth is None:
             return None
 
-        # Extract user credentials (email and password)
-        user_email, user_pwd = self.extract_user_credentials(decoded_base64)
+        decoded_auth = self.decode_base64_authorization_header(base64_auth)
+        if decoded_auth is None:
+            return None
 
+        user_email, user_pwd = self.extract_user_credentials(decoded_auth)
         if user_email is None or user_pwd is None:
             return None
 
-        # Retrieve the User instance based on credentials
-        user = self.user_object_from_credentials(user_email, user_pwd)
-
-        return user
+        return self.user_object_from_credentials(user_email, user_pwd)
